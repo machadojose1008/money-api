@@ -46,6 +46,9 @@ public class Categoria {
 		return Objects.hash(codigo, nome);
 	}
 
+	
+	
+	
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)

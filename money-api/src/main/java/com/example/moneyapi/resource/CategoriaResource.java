@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import com.example.moneyapi.event.RecursoCriadoEvent;
 import com.example.moneyapi.model.Categoria;
 import com.example.moneyapi.repository.CategoriaRepository;
 
@@ -29,27 +31,29 @@ public class CategoriaResource {
 
 	@Autowired
 	private CategoriaRepository categoriaRepository;
-	
+
 	@GetMapping
 	public List<Categoria> listar() {
 		return categoriaRepository.findAll();
 	}
-	
+
+	@Autowired
+	private ApplicationEventPublisher publisher;
+
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
 	public ResponseEntity<Categoria> criar(@Valid @RequestBody Categoria categoria, HttpServletResponse response) {
 		Categoria categoriaSalva = categoriaRepository.save(categoria);
-		URI uri = ServletUriComponentsBuilder.fromCurrentRequestUri().path("/{codigo}").buildAndExpand(categoriaSalva.getCodigo()).toUri();
-		response.setHeader("location", uri.toASCIIString());
-		
-		return ResponseEntity.created(uri).body(categoriaSalva);
+
+		publisher.publishEvent(new RecursoCriadoEvent(this, response, categoriaSalva.getCodigo()));
+
+		return ResponseEntity.status(HttpStatus.CREATED).body(categoriaSalva);
 	}
-	
+
 	@GetMapping("/{codigo}")
 	public ResponseEntity<Categoria> buscarPeloCodigo(@PathVariable Long codigo) {
-		 Optional<Categoria> categoria = categoriaRepository.findById(codigo);
-		 return categoria.isPresent() ? ResponseEntity.ok(categoria.get()) : ResponseEntity.notFound().build();
+		Optional<Categoria> categoria = categoriaRepository.findById(codigo);
+		return categoria.isPresent() ? ResponseEntity.ok(categoria.get()) : ResponseEntity.notFound().build();
 	}
-	
-	
+
 }
