@@ -22,6 +22,8 @@ public class Lancamento {
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private Long codigo;
+	
+	
 	private String descricao;
 	private BigDecimal valor;
 	private String observacao;
