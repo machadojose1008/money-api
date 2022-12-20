@@ -26,6 +26,7 @@ import com.example.moneyapi.event.RecursoCriadoEvent;
 import com.example.moneyapi.exceptionHandler.moneyExceptionHandler.Erro;
 import com.example.moneyapi.model.Lancamento;
 import com.example.moneyapi.repository.LancamentoRepository;
+import com.example.moneyapi.repository.filter.LancamentoFilter;
 import com.example.moneyapi.service.LancamentoService;
 import com.example.moneyapi.service.exception.PessoaInexistenteOuInativaException;
 
@@ -43,8 +44,8 @@ public class LancamentoResource {
 	private LancamentoService lancamentoService;
 	
 	@GetMapping
-	public List<Lancamento> listar() {
-		return lancamentoRepository.findAll();
+	public List<Lancamento> pesquisar(LancamentoFilter lancamentoFilter) {
+		return lancamentoRepository.filtrar(lancamentoFilter);
 	}
 	
 	@Autowired
