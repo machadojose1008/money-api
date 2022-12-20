@@ -13,6 +13,7 @@ import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -57,6 +58,13 @@ public class LancamentoResource {
 		return lancamento.isPresent() ? ResponseEntity.ok(lancamento.get()) : ResponseEntity.notFound().build();
 	}
 	
+	@DeleteMapping("/{codigo}")
+	@ResponseStatus(HttpStatus.NO_CONTENT)
+	public void remover(@PathVariable Long codigo) {
+		lancamentoRepository.deleteById(codigo);
+		
+	}
+	
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
 	public ResponseEntity<Lancamento> criar(@Valid @RequestBody Lancamento lancamento, HttpServletResponse response) {
@@ -66,17 +74,7 @@ public class LancamentoResource {
 		
 		return ResponseEntity.status(HttpStatus.CREATED).body(lancamentoSalvo);
 	}
-	/*
-	 * Opção de tratamento de erros sem try catch
-	 * Tratando direto no controlador o código fica mais limpo :) 
-	 * ---com exceção do comentario do aprendiz aqui.
-	 * 
-	 *   try {
-	 *   } catch (Exception e) {
-	 *   	// TODO: handle exception
-	 *   }
-	 *      
-	 */
+	
 	
 	@ExceptionHandler({ PessoaInexistenteOuInativaException.class })
 	public ResponseEntity<Object> handlePessoaInesistenteOuInativaException(PessoaInexistenteOuInativaException ex) {
